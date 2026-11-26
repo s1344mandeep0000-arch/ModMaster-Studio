@@ -1,0 +1,8 @@
+{
+  "name": "Minecraft AI Mod Maker Studio",
+  "description": "AI-powered Minecraft Java Edition and Bedrock Add-On studio powered by Google Gemini for planning, generating, validating, and exporting complete mods.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
