@@ -210,7 +210,6 @@ export function validateModProject(project: ModProject): ValidationIssue[] {
     return issues;
   }
 
-  // 1. Loader-specific manifest checks
   if (project.loader === 'fabric') {
     const fabricManifest = project.files.find((f) =>
       f.path.endsWith('fabric.mod.json')
@@ -357,7 +356,6 @@ export function validateModProject(project: ModProject): ValidationIssue[] {
     }
   }
 
-  // 2. File-by-file syntax & structural checks
   for (const file of project.files) {
     if (!file.content.trim()) {
       issues.push(
@@ -380,7 +378,6 @@ export function validateModProject(project: ModProject): ValidationIssue[] {
       try {
         const parsed = JSON.parse(file.content);
 
-        // Recipe validation (Java Edition)
         if (
           file.path.includes('/recipe/') ||
           file.path.includes('/recipes/')
@@ -408,7 +405,6 @@ export function validateModProject(project: ModProject): ValidationIssue[] {
           }
         }
 
-        // Bedrock format_version check
         if (
           project.loader === 'bedrock' &&
           (file.path.includes('behavior_pack/items/') ||
@@ -496,7 +492,6 @@ export function validateModProject(project: ModProject): ValidationIssue[] {
     }
   }
 
-  // 3. Texture cross-references & pixel integrity
   for (const tex of project.textures) {
     if (!tex.rows || tex.rows.length !== 16) {
       issues.push(
@@ -527,7 +522,6 @@ export function validateModProject(project: ModProject): ValidationIssue[] {
     }
   }
 
-  // Check element texture & file references
   for (const el of project.elements) {
     if (el.texturePath && !texturePaths.has(el.texturePath)) {
       issues.push(

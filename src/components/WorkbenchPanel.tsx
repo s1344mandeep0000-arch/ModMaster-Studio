@@ -158,7 +158,6 @@ export const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({
 
   return (
     <section className="flex flex-col h-full min-h-0 bg-[#0E131D] border-l border-slate-800/90">
-      {/* Workbench Tab Strip */}
       <div className="flex items-center justify-between gap-4 px-4 py-2.5 border-b border-slate-800/90 bg-[#111827]/70">
         <div className="flex items-center gap-1 p-1 rounded-lg bg-[#0B0F17] border border-slate-800/80 overflow-x-auto">
           <button
@@ -215,7 +214,6 @@ export const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({
         </div>
       </div>
 
-      {/* Empty State */}
       {project.files.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
           <div className="w-11 h-11 rounded-xl bg-slate-800/80 border border-slate-700/70 flex items-center justify-center mb-4">
@@ -230,10 +228,8 @@ export const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({
         </div>
       ) : (
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-          {/* FILES & CODE TAB */}
           {activeTab === 'files' && (
             <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[240px_1fr]">
-              {/* File Tree */}
               <div className="border-b lg:border-b-0 lg:border-r border-slate-800/90 flex flex-col min-h-0 max-h-56 lg:max-h-none bg-[#0B0F17]/60">
                 <div className="p-2.5 border-b border-slate-800/80">
                   <div className="relative">
@@ -285,7 +281,6 @@ export const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({
                 </div>
               </div>
 
-              {/* Code Editor */}
               {selectedFile ? (
                 <div className="flex flex-col min-h-0 bg-[#0A0E16]">
                   <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-slate-800/90 bg-[#0E131D]">
@@ -348,7 +343,6 @@ export const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({
             </div>
           )}
 
-          {/* TEXTURES & MODELS TAB */}
           {activeTab === 'textures' && (
             <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-6">
               {project.textures.length === 0 ? (
@@ -478,7 +472,6 @@ export const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({
             </div>
           )}
 
-          {/* COMPONENTS & RECIPES TAB */}
           {activeTab === 'elements' && (
             <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-5">
               <div className="flex flex-wrap items-center gap-1 p-1 rounded-lg bg-[#0B0F17] border border-slate-800 w-fit">
@@ -610,13 +603,12 @@ export const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({
             </div>
           )}
 
-          {/* VALIDATOR TAB */}
           {activeTab === 'validator' && (
             <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
                 <div className="space-y-1">
                   <h3 className="text-sm font-semibold text-white">
-                    Mod Syntax, Schema & Reference Validator
+                    Mod Syntax, Schema &amp; Reference Validator
                   </h3>
                   <div className="flex items-center gap-2 text-xs text-slate-400 font-mono tabular-nums">
                     <span className={errorCount > 0 ? 'text-red-400' : 'text-emerald-400'}>

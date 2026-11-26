@@ -187,7 +187,6 @@ function buildConversationContext(messages: ChatMessage[], project: ModProject):
   }));
 
   const fileSummary = project.files.map((f) => {
-    // Include full content up to 3500 chars per file, capped sensibly for large projects
     const isCodeOrConfig =
       f.path.endsWith('.java') ||
       f.path.endsWith('.js') ||
@@ -313,10 +312,10 @@ CRITICAL OUTPUT RULES:
 2. When modifying an existing project, preserve working files and emit only new or updated files in upsertFiles (plus any obsolete paths in deleteFiles). When creating a new project, generate the full mod skeleton + all requested blocks, weapons, armor, items, mobs, recipes, structures, models, and textures.
 3. Textures: For every block, item, weapon, armor piece, or mob icon, generate a crisp 16x16 pixel-art texture in upsertTextures!
    - Use "paletteEntries": array of { symbol: single-char string (e.g. "#", "A", "B", "."), hex: "#RRGGBB" or "transparent" }.
-   - Use "rows": exactly 16 strings, each exactly 16 characters long, forming recognizable pixel art (sword blade & hilt, chestplate silhouette, ore specks on stone, glowing crystal, mob face, etc.).
-   - Texture "path" must match the exact asset path used in your JSON models / item_texture.json / terrain_texture.json (e.g. "src/main/resources/assets/<modid>/textures/item/void_sword.png" for Java, or "resource_pack/textures/items/void_sword.png" for Bedrock).
+   - Use "rows": exactly 16 strings, each exactly 16 characters long, forming recognizable pixel art.
+   - Texture "path" must match the exact asset path used in your JSON models / item_texture.json / terrain_texture.json.
 4. Elements: Populate upsertElements for every block, weapon, armor, item, mob, recipe, and structure so the user can inspect stats, crafting recipes (3x3 pattern + keyEntries), and linked textures/files.
-5. Recipes & Structures: Include real Minecraft recipe JSONs and structure/worldgen JSONs (or Bedrock structure/feature JSONs + mcfunction/script helpers) whenever requested or appropriate for progression.
+5. Recipes & Structures: Include real Minecraft recipe JSONs and structure/worldgen JSONs whenever requested or appropriate for progression.
 6. Validation-Ready: Ensure all JSON files are strictly valid JSON, all Java class names match their filenames, all package declarations match directory paths, and all Bedrock manifest UUIDs are valid v4 UUIDs.`;
 
   const userPayload = `User Request: ${prompt}
@@ -342,11 +341,7 @@ ${buildConversationContext(project.messages, project)}`;
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            assistantResponse: {
-              type: Type.STRING,
-              description:
-                'Clear ChatGPT-style explanation of the mod features, files created/modified, crafting recipes, and gameplay usage.',
-            },
+            assistantResponse: { type: Type.STRING },
             name: { type: Type.STRING },
             modId: { type: Type.STRING },
             description: { type: Type.STRING },
@@ -588,7 +583,10 @@ export async function repairModWithGemini(
 
   const affectedPaths = new Set(issues.map((i) => i.filePath));
   const relevantFiles = project.files.filter(
-    (f) => affectedPaths.has(f.path) || f.path.endsWith('manifest.json') || f.path.endsWith('fabric.mod.json')
+    (f) =>
+      affectedPaths.has(f.path) ||
+      f.path.endsWith('manifest.json') ||
+      f.path.endsWith('fabric.mod.json')
   );
 
   const systemInstruction = `You are a Minecraft Mod Compiler & Schema Repair Engineer.

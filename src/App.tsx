@@ -10,6 +10,7 @@ import type {
   ModProject,
   ModTexture,
 } from './types/mod';
+import { apiUrl } from './utils/api';
 import { exportModAsArchive } from './utils/modExport';
 import {
   applyPatchToProject,
@@ -53,7 +54,7 @@ export default function App() {
 
   useEffect(() => {
     let mounted = true;
-    fetch('/api/health')
+    fetch(apiUrl('/api/health'))
       .then((r) => r.json())
       .then((data) => {
         if (mounted) setApiConfigured(Boolean(data.configured));
@@ -152,7 +153,7 @@ export default function App() {
     abortRef.current = controller;
 
     try {
-      const response = await fetch('/api/mod/chat', {
+      const response = await fetch(apiUrl('/api/mod/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -333,7 +334,7 @@ export default function App() {
     setValidationNotice(null);
 
     try {
-      const response = await fetch('/api/mod/validate', {
+      const response = await fetch(apiUrl('/api/mod/validate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ project: activeProject, autoFix }),
@@ -406,9 +407,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0B0F17] text-slate-100">
-      {/* Top Bar Contract: 3 zones separated by gap-8 */}
       <header className="h-14 shrink-0 border-b border-slate-800/90 bg-[#0E131D] px-4 md:px-6 flex items-center justify-between gap-8">
-        {/* Zone 1: Brand Title */}
         <div className="flex items-center gap-3 shrink-0">
           <button
             type="button"
@@ -427,7 +426,6 @@ export default function App() {
           </a>
         </div>
 
-        {/* Zone 2: Single-line Nav Links */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
           <button
             type="button"
@@ -474,7 +472,6 @@ export default function App() {
           </button>
         </nav>
 
-        {/* Zone 3: 1 Primary CTA */}
         <div className="flex items-center shrink-0">
           <button
             type="button"
@@ -494,7 +491,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Mobile Pane Switcher */}
       <div className="md:hidden flex items-center gap-1 p-1.5 border-b border-slate-800 bg-[#0E131D]">
         <button
           type="button"
@@ -516,9 +512,7 @@ export default function App() {
         </button>
       </div>
 
-      {/* Main Studio Shell */}
       <div className="flex-1 min-h-0 flex relative">
-        {/* Left Sidebar */}
         <aside
           className={`${
             sidebarOpen ? 'flex absolute inset-y-0 left-0 z-40' : 'hidden'
@@ -535,7 +529,6 @@ export default function App() {
             </button>
           </div>
 
-          {/* Target Loader & Version Config */}
           <div className="p-3.5 border-b border-slate-800/80 space-y-3">
             <div>
               <label
@@ -582,7 +575,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Saved Projects List */}
           <div className="flex-1 min-h-0 overflow-y-auto p-2.5 space-y-1">
             <div className="px-2 py-1 text-[11px] font-medium text-slate-500">
               Mod Projects
@@ -631,7 +623,6 @@ export default function App() {
           </div>
         </aside>
 
-        {/* Center Chat + Right Workbench Grid */}
         <main className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 min-h-0">
           <div
             className={`${

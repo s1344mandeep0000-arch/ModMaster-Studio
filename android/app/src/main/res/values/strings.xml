@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Minecraft AI Mod Maker Studio</string>
+    <string name="title_activity_main">Minecraft AI Mod Maker Studio</string>
+    <string name="package_name">com.minecraft.aimodstudio</string>
+    <string name="custom_url_scheme">com.minecraft.aimodstudio</string>
+</resources>

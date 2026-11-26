@@ -1,0 +1,101 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-android-apk:
+    name: Build Minecraft AI Mod Maker Studio APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Typecheck and build web application
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: |
+          npm run lint
+          npm run build
+
+      - name: Sync Capacitor Android project
+        run: npx cap sync android
+
+      - name: Verify Kotlin-only Android source tree
+        run: |
+          if find android/app/src -name "*.java" | grep -q .; then
+            echo "Error: Java source files found in android/app/src. Kotlin only is required."
+            find android/app/src -name "*.java"
+            exit 1
+          fi
+
+      - name: Build Debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+          test -f app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Build Signed Release APK (when signing secrets are configured)
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "${ANDROID_KEYSTORE_BASE64:-}" ] && [ -n "${ANDROID_KEYSTORE_PASSWORD:-}" ] && [ -n "${ANDROID_KEY_ALIAS:-}" ] && [ -n "${ANDROID_KEY_PASSWORD:-}" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > app/release.keystore
+            trap 'rm -f app/release.keystore' EXIT
+            export ANDROID_KEYSTORE_FILE="$(pwd)/app/release.keystore"
+            ./gradlew assembleRelease --no-daemon --stacktrace
+            test -f app/build/outputs/apk/release/app-release.apk
+          else
+            echo "Signing secrets not configured; skipping optional signed release APK."
+          fi
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Minecraft-AI-Mod-Maker-Studio-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Signed Release APK Artifact (if built)
+        if: ${{ hashFiles('android/app/build/outputs/apk/release/app-release.apk') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Minecraft-AI-Mod-Maker-Studio-Release-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 30

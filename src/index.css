@@ -28,7 +28,6 @@
   image-rendering: crisp-edges;
 }
 
-/* Subtle studio scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

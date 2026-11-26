@@ -27,6 +27,25 @@ async function startServer() {
   const app = express();
   app.use(express.json({ limit: '8mb' }));
 
+  app.use('/api', (req, res, next) => {
+    const origin = req.headers.origin;
+    const allowedOrigins = new Set([
+      'https://localhost',
+      'http://localhost',
+      'capacitor://localhost',
+    ]);
+    if (origin && (allowedOrigins.has(origin) || origin === process.env.APP_URL)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    }
+    if (req.method === 'OPTIONS') {
+      res.status(204).end();
+      return;
+    }
+    next();
+  });
+
   app.get('/api/health', (_req, res) => {
     const configured = isApiKeyConfigured();
     res.json({
@@ -141,7 +160,6 @@ async function startServer() {
           upsertTextures: repair.upsertTextures,
         });
 
-        // Merge repaired files/textures into the patch returned to client
         const filePatchMap = new Map(finalUpsertFiles.map((f) => [f.path, f]));
         for (const rf of repair.upsertFiles) {
           filePatchMap.set(rf.path, rf);
